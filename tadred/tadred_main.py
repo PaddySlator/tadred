@@ -18,6 +18,8 @@ import argparse
 import logging
 import timeit
 
+from matplotlib.path import Path
+from matplotlib.path import Path
 import numpy as np
 from omegaconf import DictConfig, OmegaConf
 
@@ -25,6 +27,9 @@ from .data_processing import create_data_norm
 from .trainer import Trainer
 from .utils import create_out_dirs, load_yaml, save_results_dir, set_random_seed
 
+import torch
+import os
+    
 log = logging.getLogger(__name__)
 
 
@@ -63,8 +68,29 @@ def run(args: DictConfig, pass_data: dict[str, np.ndarray] | None = None) -> dic
     results.update(results_performance)
     results["args"] = args
     out_dirs = create_out_dirs(**args.output)
+    print("OUTPUT DIRS:", out_dirs)
+    print(args.output)    
     save_results_dir(out_dirs["out_base_dir"], out_dirs["results_fn"], results=results)
+    
+    
+    #new way of saving the model - .pt file including the model architecture and weights
+    checkpoint = {
+        "model_state_dict": nnet.model.state_dict(),
+        "args": OmegaConf.to_container(args, resolve=True),
+        "data_features_norm": data_features_norm,
+    }
 
+    print(out_dirs)
+    print(args.output)
+    model_path = os.path.join(os.path.splitext(out_dirs["results_fn"])[0] + "_trained_model.pt")
+    print(f"Saving trained model to {model_path}")
+    torch.save(
+        checkpoint,
+        model_path,
+    )
+
+
+    
     time_s = timeit.default_timer() - start_train_timer
     log.info(f"Total runtime (s): {time_s} (h): {time_s / 3600}")
 
