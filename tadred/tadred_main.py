@@ -73,6 +73,7 @@ def run(args: DictConfig, pass_data: dict[str, np.ndarray] | None = None) -> dic
     save_results_dir(out_dirs["out_base_dir"], out_dirs["results_fn"], results=results)
     
     
+    ##CHANGES - Paddy Slator 3/09/2026
     #new way of saving the model - .pt file including the model architecture and weights
     checkpoint = {
         "model_state_dict": nnet.model.state_dict(),
@@ -80,14 +81,13 @@ def run(args: DictConfig, pass_data: dict[str, np.ndarray] | None = None) -> dic
         "data_features_norm": data_features_norm,
     }
 
-  
     model_path = os.path.join(os.path.splitext(out_dirs["results_fn"])[0] + "_trained_model.pt")
     print(f"Saving trained model to {model_path}")
     torch.save(
         checkpoint,
         model_path,
     )
-
+    ##END OF CHANGES - Paddy Slator 3/09/2026
 
     
     time_s = timeit.default_timer() - start_train_timer
