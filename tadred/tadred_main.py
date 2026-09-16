@@ -81,8 +81,8 @@ def run(args: DictConfig, pass_data: dict[str, np.ndarray] | None = None) -> dic
         "data_features_norm": data_features_norm,
     }
 
-    model_path = os.path.join(os.path.splitext(out_dirs["results_fn"])[0] + "_trained_model.pt")
-    print(f"Saving trained model to {model_path}")
+    model_path = os.path.join(os.path.splitext(out_dirs["results_fn"])[0] + "_trained_task_network.pt")
+    print(f"Saving trained task network to {model_path}")
     torch.save(
         checkpoint,
         model_path,
