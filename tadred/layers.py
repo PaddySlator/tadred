@@ -49,15 +49,15 @@ class FCN(torch.nn.Module):
         """
         super().__init__()
         if inp_loss_affine_0 is None:
-            inp_affine_0_prod = np.array(1)
+            inp_affine_0_prod = np.array(1, dtype=np.float32)
         else:
             inp_affine_0_prod = inp_loss_affine_0
         if out_loss_affine_0 is None:
-            out_affine_0_prod = np.array(1)
+            out_affine_0_prod = np.array(1, dtype=np.float32)
         else:
             out_affine_0_prod = out_loss_affine_0
-        self.register_buffer("inp_affine_0_prod", torch.tensor(inp_affine_0_prod))
-        self.register_buffer("out_affine_0_prod", torch.tensor(out_affine_0_prod))
+        self.register_buffer("inp_affine_0_prod", torch.tensor(inp_affine_0_prod, dtype=torch.float32))
+        self.register_buffer("out_affine_0_prod", torch.tensor(out_affine_0_prod, dtype=torch.float32))
 
         layers: list[torch.nn.Module] = []
         if len(inter_units) == 0:
@@ -79,7 +79,7 @@ class FCN(torch.nn.Module):
         layers = layers + [return_act_func[final_act_fn]]
         self.layers = torch.nn.Sequential(*layers)
 
-    def forward(self, x):
+    def forward(self, x):       
         if self.inp_affine_0_prod is not None:
             x = x / self.inp_affine_0_prod
         x = self.layers(x)
