@@ -58,12 +58,12 @@ def apply_trained_task_network(network_path, data_path):
     dataset = np.load(
         data_path,
         allow_pickle=True,
-    ).item()
+    )
 
     # Apply network
     with torch.no_grad():
         output = nnet.model.forward_eval(
-            dataset["test"],
+            dataset,
             score=1,
         )
 
