@@ -18,6 +18,8 @@ import logging
 
 import numpy as np
 import torch
+import torch.nn as nn
+
 from omegaconf import OmegaConf
 
 from .layers import FCN, DownsamplingMultLayer, get_score_activation
@@ -226,3 +228,64 @@ class TADREDNet(TADREDBase):
         loss = self.forward_and_loss(x, y)
         loss.backward()
         return loss
+
+
+
+class ReducedTADREDTaskNetwork(nn.Module):
+    """
+    Wrapper around a trained TADRED model that accepts only the
+    measurements selected by the final TADRED mask.
+    """
+
+    def __init__(self, tadred_model):
+        super().__init__()
+
+        self.model = tadred_model
+
+        # Get final binary measurement mask
+        m = tadred_model.downsampling_mult_layer.m
+
+        selected_indices = torch.where(m > 0)[0]
+
+        self.register_buffer(
+            "selected_indices",
+            selected_indices,
+        )
+
+        self.n_full_measurements = len(m)
+        self.n_selected_measurements = len(selected_indices)
+
+    def forward(self, x):
+        """
+        Parameters
+        ----------
+        x : torch.Tensor
+            Reduced input with shape:
+                (n_samples, n_selected_measurements)
+
+        Returns
+        -------
+        torch.Tensor
+            Task-network output.
+        """
+
+        if x.shape[-1] != self.n_selected_measurements:
+            raise ValueError(
+                f"Expected {self.n_selected_measurements} measurements, "
+                f"but received {x.shape[-1]}."
+            )
+
+        # Reconstruct original full input
+        x_full = torch.zeros(
+            (*x.shape[:-1], self.n_full_measurements),
+            dtype=x.dtype,
+            device=x.device,
+        )
+
+        x_full[..., self.selected_indices] = x
+
+        # Apply the existing trained network
+        return self.model.forward_eval(
+            x_full,
+            score=1,
+        )

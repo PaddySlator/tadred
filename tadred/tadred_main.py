@@ -75,10 +75,16 @@ def run(args: DictConfig, pass_data: dict[str, np.ndarray] | None = None) -> dic
     
     ##CHANGES - Paddy Slator 3/09/2026
     #new way of saving the model - .pt file including the model architecture and weights
+
+    selected_indices = torch.where(
+        nnet.model.downsampling_mult_layer.m > 0
+    )[0].cpu().numpy()
+
     checkpoint = {
         "model_state_dict": nnet.model.state_dict(),
         "args": OmegaConf.to_container(args, resolve=True),
         "data_features_norm": data_features_norm,
+        "selected_indices": selected_indices,
     }
 
     model_path = os.path.join(os.path.splitext(out_dirs["results_fn"])[0] + "_trained_task_network.pt")

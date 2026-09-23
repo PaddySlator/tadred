@@ -178,3 +178,68 @@ def tadred_data_format(
     for key, val in data.items():
         assert isinstance(val, np.ndarray)
     return data
+
+
+def split_train_val_test(
+    x: np.ndarray,
+    y: np.ndarray | None = None,
+    train_fraction: float = 0.8,
+    val_fraction: float = 0.1,
+    test_fraction: float = 0.1,
+    random_state: int | None = None,
+    shuffle: bool = True,
+) -> Data:
+    """Split input arrays into train, validation, and test sets.
+
+    Args:
+        x: Input data with samples along axis 0.
+        y: Target data with samples along axis 0. If None, targets are set
+            equal to the inputs.
+        train_fraction: Fraction of samples assigned to training.
+        val_fraction: Fraction of samples assigned to validation.
+        test_fraction: Fraction of samples assigned to testing.
+        random_state: Random seed for reproducible splitting.
+        shuffle: Whether to shuffle samples before splitting.
+
+    Returns:
+        Data object containing train, validation, and test splits.
+    """
+    if not np.isclose(train_fraction + val_fraction + test_fraction, 1.0):
+        raise ValueError(
+            "train_fraction, val_fraction, and test_fraction must sum to 1."
+        )
+
+    if y is None:
+        y = x
+
+    if x.shape[0] != y.shape[0]:
+        raise ValueError(
+            "x and y must contain the same number of samples."
+        )
+
+    n_samples = x.shape[0]
+
+    indices = np.arange(n_samples)
+
+    if shuffle:
+        rng = np.random.default_rng(random_state)
+        rng.shuffle(indices)
+
+    n_train = int(n_samples * train_fraction)
+    n_val = int(n_samples * val_fraction)
+
+    train_idx = indices[:n_train]
+    val_idx = indices[n_train:n_train + n_val]
+    test_idx = indices[n_train + n_val:]
+
+    #put data in tadred format
+    data = dict(
+            train=x[train_idx].astype(np.float32),
+            train_tar=y[train_idx].astype(np.float32),
+            val=x[val_idx].astype(np.float32),
+            val_tar=y[val_idx].astype(np.float32),
+            test=x[test_idx].astype(np.float32),
+            test_tar=y[test_idx].astype(np.float32),
+        )
+
+    return data
