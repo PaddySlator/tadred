@@ -8,62 +8,120 @@ from .trainer import Trainer
 
 
 
-def apply_trained_task_network(network_path, data_path):
+def apply_trained_task_network(trained_model, data):
     """
-    Load a trained TADRED network and apply it to a dataset.
+    Apply a trained TADRED task network.
 
-    Parameters
-    ----------
-    network_path : str or Path
-        Path to the trained PyTorch checkpoint.
-
-    data_path : str or Path
-        Path to the .npy dataset. The loaded dictionary is expected
-        to contain a 'test' entry.
-
-    Returns
-    -------
-    output : torch.Tensor
-        Network output for the test data.
+    trained_model can be either:
+        - a live torch.nn.Module
+        - a path to a saved checkpoint
     """
 
-    network_path = Path(network_path)
-    data_path = Path(data_path)
+    # --------------------------------------------------
+    # Load model if a checkpoint path was supplied
+    # --------------------------------------------------
 
-    # Load trained network
-    checkpoint = torch.load(
-        network_path,
-        map_location="cpu",
-        weights_only=False,
-    )
+    if isinstance(trained_model, (str, Path)):
+            # Load trained network
+            checkpoint = torch.load(
+                trained_model,
+                map_location="cpu",
+                weights_only=False,
+            )
+        
+            args = OmegaConf.create(checkpoint["args"])
+            data_features_norm = checkpoint["data_features_norm"]
+        
+        
+            # ---------------------------------------------------------
+            # Reconstruct trained TADRED model
+            # ---------------------------------------------------------
+            nnet = Trainer(
+                tadred_train_eval=args.tadred_train_eval,
+                network=args.network,
+                data_features_norm=data_features_norm,
+                train_pytorch=args.train_pytorch,
+                other_options=args.other_options,
+            )
+        
+            nnet.device = "cpu"
+            nnet._create_model()
 
-    args = OmegaConf.create(checkpoint["args"])
-    data_features_norm = checkpoint["data_features_norm"]
+            nnet.model.load_state_dict(
+                checkpoint["model_state_dict"]
+            )
+            
+            model = nnet.model           
+    else:
+        model = trained_model
+    
+    model.eval()
 
-    nnet = Trainer(
-        tadred_train_eval=args.tadred_train_eval,
-        network=args.network,
-        data_features_norm=data_features_norm,
-        train_pytorch=args.train_pytorch,
-        other_options=args.other_options,
-    )
+    # --------------------------------------------------
+    # Load data if a path was supplied
+    # --------------------------------------------------
+    
+    if isinstance(data, (str, Path)):
+        dataset = np.load(
+            data,
+            allow_pickle=True,
+        )
+    else:
+        dataset = np.asarray(data)
+    
+    if data.ndim != 2:
+        raise ValueError(
+            "Input data must have shape "
+            "(n_samples, n_measurements)."
+        )
+        
+    # ---------------------------------------------------------
+    # Determine retained measurements
+    # ---------------------------------------------------------
 
-    nnet.device = "cpu"
-    nnet._create_model()
+    m = model.downsampling_mult_layer.m
 
-    nnet.model.load_state_dict(checkpoint["model_state_dict"])
-    nnet.model.eval()
+    selected_indices = torch.where(
+        m > 0
+    )[0].cpu().numpy()
 
-    # Load data
-    dataset = np.load(
-        data_path,
-        allow_pickle=True,
-    )
+    n_full_measurements = len(m)
+    n_selected_measurements = len(selected_indices)
 
-    # Apply network
+    n_input_measurements = data.shape[-1]
+        
+    # ---------------------------------------------------------
+    # Expand reduced data if necessary
+    # ---------------------------------------------------------
+
+    if n_input_measurements == n_selected_measurements:
+
+        data_full = np.zeros(
+            (dataset.shape[0], n_full_measurements),
+            dtype=np.float32,
+        )
+
+        data_full[:, selected_indices] = dataset
+
+    elif n_input_measurements == n_full_measurements:
+
+        data_full = dataset.astype(np.float32)
+
+    else:
+
+        raise ValueError(
+            f"Input contains {n_input_measurements} measurements, but the "
+            f"trained network expects either {n_selected_measurements} "
+            f"selected measurements or {n_full_measurements} full "
+            "measurements."
+        )
+        
+    # ---------------------------------------------------------
+    # Apply Neural Network to the full data
+    # ---------------------------------------------------------
     with torch.no_grad():
-        output = nnet.model.forward_eval(
-            dataset,
+        output = model.forward_eval(
+            data_full,
             score=1,
         )
 

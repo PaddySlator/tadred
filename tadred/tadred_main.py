@@ -93,4 +93,4 @@ def run(args: DictConfig, pass_data: dict[str, np.ndarray] | None = None) -> dic
     time_s = timeit.default_timer() - start_train_timer
     log.info(f"Total runtime (s): {time_s} (h): {time_s / 3600}")
 
-    return results
+    return results, nnet.model
