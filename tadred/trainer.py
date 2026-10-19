@@ -120,6 +120,7 @@ class Trainer:
 
         self.model.on_epoch_end()
         print(
+            f"TADRED Training Step {self.model.t:.0f} "
             f"Epoch:{epoch:.0f} train_loss:{mean_train:.3f} val_loss:{mean_val:.3f} "
             f"time:{timeit.default_timer() - start_epoch:.3f}"
         )
