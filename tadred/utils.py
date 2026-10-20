@@ -42,14 +42,14 @@ def create_out_dirs(
     if out_base is not None:
         out_base_dir = Path(out_base, proj_name)
         out_base_dir.mkdir(parents=True, exist_ok=True)
-        log.info("Output base directory:", out_base_dir)
+        log.info("Output base directory: %s", out_base_dir)
         results_dir = Path(out_base_dir, "results")
         results_dir.mkdir(parents=True, exist_ok=True)
-        log.info("Output results directory:", out_base_dir)
-        results_fn = Path(results_dir, run_name + "_all.npy")
+        log.info("Output results directory: %s", out_base_dir)
+        results_fn = Path(results_dir, run_name + "_tadred_full_results.npy")
 
         save_model_path = Path(out_base_dir, run_name)
-        log.info("Model is saved to", save_model_path)
+        log.info("Model is saved to %s", save_model_path)
     else:
         out_base_dir = None
         results_fn = None
@@ -99,7 +99,7 @@ def load_results(
     if full_path is not None:
         load_path = Path(full_path)
     elif out_base_dir is not None and run_name is not None:
-        load_path = Path(out_base_dir, "results", f"{run_name}_all.npy")
+        load_path = Path(out_base_dir, "results", f"{run_name}_tadred_full_results.npy")
     else:
         raise ValueError("Pass either full_path, or out_base_dir and run_name to create full_path")
     results_load = np.load(str(load_path), allow_pickle=True).item()
@@ -113,7 +113,7 @@ def save_results_dir(
 ) -> None:
     """Save final results file if requested"""
     if out_base_dir is not None:
-        log.info("Saving final results in", results_fn)
+        log.info("Saving final results in %s", results_fn)
         with open(str(results_fn), "wb") as file:
             pkl.dump(results, file)
         # np.save(str(results_fn), results)
