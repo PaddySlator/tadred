@@ -30,8 +30,8 @@ log = logging.getLogger(__name__)
 
 def create_out_dirs(
     out_base: str | None = None,
-    proj_name: str = "tst",
-    run_name: str = "def",
+    proj_name: str = "results",
+    run_name: str = "tadred_output_",
 ) -> dict[str, Path | None]:
     """Create directories to save output if out_base is not None
 
@@ -43,10 +43,10 @@ def create_out_dirs(
         out_base_dir = Path(out_base, proj_name)
         out_base_dir.mkdir(parents=True, exist_ok=True)
         log.info("Output base directory: %s", out_base_dir)
-        results_dir = Path(out_base_dir, "results")
+        results_dir = Path(out_base_dir, "full_results")
         results_dir.mkdir(parents=True, exist_ok=True)
         log.info("Output results directory: %s", out_base_dir)
-        results_fn = Path(results_dir, run_name + "_tadred_full_results.npy")
+        results_fn = Path(results_dir, run_name + "full_results.npy")
 
         save_model_path = Path(out_base_dir, run_name)
         log.info("Model is saved to %s", save_model_path)
@@ -136,3 +136,15 @@ def set_random_seed(seed: int) -> None:
     # os.environ["PYTHONHASHSEED"] = str(seed)
 
     log.info(f"Random seed is {seed}")
+
+
+def format_runtime(time_s):
+    """Format a duration in seconds as hours, minutes and seconds."""
+    hours, remainder = divmod(time_s, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    if hours:
+        return f"{int(hours)}h {int(minutes)}m {seconds:.1f}s"
+    if minutes:
+        return f"{int(minutes)}m {seconds:.1f}s"
+    return f"{seconds:.1f}s"

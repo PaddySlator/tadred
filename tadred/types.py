@@ -33,8 +33,8 @@ class DataNorm:
 @dataclass
 class Output:
     out_base: str | None = None  # Outputs saved directory, set to None to not save results file
-    proj_name: str = "tst"  # Output proj_name/run_name
-    run_name: str = "def"  # Output proj_name/run_name
+    proj_name: str = "tadred_results_"  # Output proj_name/run_name
+    run_name: str = "tadred_output_"  # Output proj_name/run_name
 
 
 @dataclass

@@ -25,7 +25,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from .data_processing import create_data_norm
 from .trainer import Trainer
-from .utils import create_out_dirs, load_yaml, save_results_dir, set_random_seed
+from .utils import create_out_dirs, format_runtime, load_yaml, save_results_dir, set_random_seed
 
 import torch
 import os
@@ -87,7 +87,7 @@ def run(args: DictConfig, pass_data: dict[str, np.ndarray] | None = None) -> dic
         "selected_indices": selected_indices,
     }
 
-    model_path = os.path.join(os.path.splitext(out_dirs["results_fn"])[0] + "_trained_task_network.pt")
+    model_path = os.path.join(out_dirs["out_base_dir"], "trained_task_network.pt")
     print(f"Saving trained task network to {model_path}")
     torch.save(
         checkpoint,
@@ -97,6 +97,6 @@ def run(args: DictConfig, pass_data: dict[str, np.ndarray] | None = None) -> dic
 
     
     time_s = timeit.default_timer() - start_train_timer
-    log.info(f"Total runtime (s): {time_s} (h): {time_s / 3600}")
+    log.info("Total runtime: %s", format_runtime(time_s))
 
     return results, nnet.model
