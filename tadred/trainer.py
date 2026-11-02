@@ -1,3 +1,6 @@
+# Modified by Paddy Slator, 2026.
+# Original source: https://github.com/sbb-gh/tadred
+
 """
 Copyright 2024 Stefano B. Blumberg
 

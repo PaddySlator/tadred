@@ -1,5 +1,12 @@
 # Code for TADRED: TAsk-DRiven Experimental Design in imaging
 
+## This is a fork
+This repository is a modified version of [TADRED](https://github.com/sbb-gh/tadred), originally developed by Stefano Blumberg and collaborators. Modifications are identified in the relevant source files. 
+
+## Contact 
+[slatorp@cardiff.ac.uk](mailto:slatorp@cardiff.ac.uk).
+
+## Overview
 TADRED identifies the most informative channel-subset whilst simultaneously training a network to execute the task given the subset.
 
 TADRED is a novel method for TAsk-DRiven experimental design in imaging.  TADRED couples feature scoring and task execution in consecutive networks.  The scoring and subsampling procedure enables efficient identification of subsets of complementarily informative channels jointly with training a high-performing network for the task.  TADRED also gradually reduces the full set of samples stepwise to obtain the subsamples, which improves optimization.
@@ -7,18 +14,13 @@ TADRED is a novel method for TAsk-DRiven experimental design in imaging.  TADRED
 
 ## Citation
 
-Please consider citing our paper:
+If you use TADRED in your work please cite the accompanying paper: 
 
-@article{<br>
-&nbsp; &nbsp; title={Experimental Design for Multi-Channel Imaging via Task-Driven Feature Selection},<br>
-&nbsp; &nbsp; author={Stefano B. Blumberg and Paddy J. Slator and Daniel C. Alexander},<br>
-&nbsp; &nbsp; journal={In: International Conference on Learning Representations (ICLR)},<br>
-&nbsp; &nbsp; year={2024}<br>
-}
+1. Blumberg, S., Slator, P.J., & Alexander, D.C. (2024). **Experimental Design for Multi-Channel Imaging via Task-Driven Feature Selection.** *International Conference on Learning Representations (ICLR 2024).* [paper](https://proceedings.iclr.cc/paper_files/paper/2024/hash/aec2dfc4f5e19acf05c15587c889dbc4-Abstract-Conference.html), [code](https://github.com/sbb-gh/tadred)
 
-## Contact
+<!--## Contact
 
-stefano.blumberg.17@ucl.ac.uk
+stefano.blumberg.17@ucl.ac.uk-->
 
 ## Installation Part 1: Environment
 
@@ -80,4 +82,5 @@ This project is licensed under the terms of the Apache 2.0 license. For more det
 
 ## Acknowledgments
 
+The original TADRED code 
 Many thanks to David Perez-Suarez, Stefan Piatek, Tom Young, who provided valuable feedback on the code.
