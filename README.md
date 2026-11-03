@@ -22,27 +22,38 @@ If you use TADRED in your work please cite the accompanying paper:
 
 stefano.blumberg.17@ucl.ac.uk-->
 
-## Installation Part 1: Environment
+## Installation 
 
-First create an environment and enter it, we use Python v3.10.4.  We provide two examples either using Pyenv or Conda:
+To improve robustness and avoid unnecessary dependencies, the relevant pyproject.toml files specify flexible dependency constraints rather than pinning exact versions. The code has been fully tested with PyTorch 2.15. We  use pyenv for python version management and recommend **Python 3.14**. 
 
-## Pyenv
+###Installation Part 1: Directory set up
 
-```bash
-# Pyenv documentation is [link](https://github.com/pyenv), where <INSTALL_DIR> is the directory the virtual environment is installed in.
-python3.10 -m venv <INSTALL_DIR>/TADRED_env # Use compatible Python version e.g. 3.10.4
-. <INSTALL_DIR>/TADRED_env/bin/activate
+First create and move to the desired installation directory.
+
+```bash 
+mkdir <INSTALL_DIR>
+cd <INSTALL_DIR>
 ```
 
-## Conda
+###Installation Part 2: Environment
+
+First create an environment and enter it.  We provide two examples either using Pyenv or Conda:
+
+#### Option 1 - [Pyenv](https://github.com/pyenv)
 
 ```bash
-# Conda documentation is [link](https://docs.conda.io/en/latest/), where <INSTALL_DIR> is the directory the virtual environment is installed in.
-conda create -n tadred python=3.10.4
+python -m venv .venv
+source .venv/bin/activate
+```
+
+#### Option 2 - [Conda](https://docs.conda.io/en/latest/)
+
+```bash
+conda create -n tadred 
 conda activate tadred
 ```
 
-## Installation Part 2: Packages and Code
+#### Installation Part 2: Packages and Code
 
 Code requires: pytorch, numpy, pyyaml, hydra.
 
@@ -82,5 +93,4 @@ This project is licensed under the terms of the Apache 2.0 license. For more det
 
 ## Acknowledgments
 
-The original TADRED code 
-Many thanks to David Perez-Suarez, Stefan Piatek, Tom Young, who provided valuable feedback on the code.
+The original TADRED code is [here](https://github.com/sbb-gh/tadred)
